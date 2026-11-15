@@ -52,6 +52,8 @@ export interface DocState {
 	completedAt?: string;
 	/** `git rev-parse HEAD` when the interview completed; update runs diff against it. */
 	completedCommit?: string;
+	/** Written on every save for outside readers (DevDeck+): all topics in order, titled in `lang`. */
+	topics?: { id: TopicId; title: string }[];
 }
 
 export const stateDir = (root: string): string => path.join(root, ".documentizer");
@@ -78,7 +80,8 @@ export function saveState(root: string, state: DocState): void {
 	fs.mkdirSync(stateDir(root), { recursive: true });
 	const file = stateFile(root);
 	const tmp = `${file}.${process.pid}.tmp`;
-	fs.writeFileSync(tmp, `${JSON.stringify(state, null, "\t")}\n`);
+	const topics = TOPICS.map(t => ({ id: t.id, title: t[state.lang] }));
+	fs.writeFileSync(tmp, `${JSON.stringify({ ...state, topics }, null, "\t")}\n`);
 	fs.renameSync(tmp, file);
 }
 

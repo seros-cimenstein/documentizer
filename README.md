@@ -28,13 +28,15 @@ What happens:
    - **Stop**: pauses; run `/documentize` later to continue where you left off
 4. **Re-runs.** A paused interview resumes. A finished one is updated: the agent diffs the code since the commit recorded at completion and asks only about what changed or is still open.
 
-Forms are omp's `ui.formDialog`, so DevDeck+ can answer them from the phone.
+## On the phone (DevDeck+)
+
+With DevDeck+ (`~/projects/quality_of_life_setups/devdeck-plus`), questions open in its question sheet with the interview's progress (topics done, current topic) on top; ELI5 swaps the explanation in without closing the sheet. A banner on the terminal shows the interview's state with Continue/Update (`/documentize`), `PROJECT.md` and the `PROJECT.space` map. DevDeck+ reads `.documentizer/state.json`, so keep its `phase`, `topicsDone` and `topics` fields stable.
 
 ## Files it writes (project root)
 
 - `PROJECT.md`: one section per topic, Map (mermaid from `loren mermaid`), Decisions, Open questions
 - `PROJECT.space`: Loren Space map, grows live during the interview
-- `.documentizer/state.json`: language, phase, finished topics, every answer with its source (`user` / `agent` / `skipped`)
+- `.documentizer/state.json`: language, phase, finished topics, every answer with its source (`user` / `agent` / `skipped`), and the topic list titled in the interview language (for DevDeck+)
 
 ## Repo
 

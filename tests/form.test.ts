@@ -78,7 +78,8 @@ describe("state", () => {
 		state.topicsDone.push("purpose");
 		saveState(root, state);
 		const loaded = loadState(root);
-		expect(loaded).toEqual(state);
+		expect(loaded).toMatchObject(state);
+		expect(loaded!.topics![0]).toEqual({ id: "purpose", title: "Purpose and users" });
 		expect(remainingTopics(loaded!)[0]).toBe("scope");
 	});
 });
