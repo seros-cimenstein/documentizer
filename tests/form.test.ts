@@ -3,7 +3,7 @@ import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import { buildForm, type Question, readAnswer, recommendationText } from "../extension/form";
-import { loadState, newState, remainingTopics, saveState } from "../extension/state";
+import { loadState, migrateRootLayout, newState, remainingTopics, saveState, stateFile } from "../extension/state";
 
 const q: Question = {
 	question: "Veri nerede <saklanır>?",
@@ -81,5 +81,26 @@ describe("state", () => {
 		expect(loaded).toMatchObject(state);
 		expect(loaded!.topics![0]).toEqual({ id: "purpose", title: "Purpose and users" });
 		expect(remainingTopics(loaded!)[0]).toBe("scope");
+	});
+
+	test("moves a root-layout interview into docs/ without overwriting docs/ files", () => {
+		const old = fs.mkdtempSync(path.join(os.tmpdir(), "documentizer-"));
+		try {
+			fs.mkdirSync(path.join(old, ".documentizer"));
+			fs.writeFileSync(path.join(old, ".documentizer", "state.json"), JSON.stringify(newState("tr")));
+			fs.writeFileSync(path.join(old, "PROJECT.md"), "old");
+			fs.writeFileSync(path.join(old, "PROJECT.space"), "space");
+			fs.mkdirSync(path.join(old, "docs"));
+			fs.writeFileSync(path.join(old, "docs", "PROJECT.space"), "mine");
+			expect(migrateRootLayout(old)).toEqual([".documentizer", "PROJECT.md"]);
+			expect(loadState(old)?.lang).toBe("tr");
+			expect(fs.readFileSync(path.join(old, "docs", "PROJECT.md"), "utf8")).toBe("old");
+			expect(fs.readFileSync(path.join(old, "docs", "PROJECT.space"), "utf8")).toBe("mine");
+			expect(fs.existsSync(path.join(old, "PROJECT.space"))).toBe(true);
+			expect(migrateRootLayout(old)).toEqual([]);
+			expect(stateFile(old)).toBe(path.join(old, "docs", ".documentizer", "state.json"));
+		} finally {
+			fs.rmSync(old, { recursive: true, force: true });
+		}
 	});
 });

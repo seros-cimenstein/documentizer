@@ -1,13 +1,14 @@
 /**
  * documentizer: maps a project's structure and interviews the user, one question at a time, until
- * every topic of its scope is written down in PROJECT.md (+ PROJECT.space map).
+ * every topic of its scope is written down in docs/PROJECT.md (+ docs/PROJECT.space map).
  *
  * - `/documentize [--lang tr|en]` starts, resumes or updates the interview in the current directory
  *   by sending the agent the prompt in `prompts/documentize.md`.
  * - `doc_ask` shows one question as an omp form (also answerable from the phone via DevDeck+). Each
  *   question carries a prepared ELI5 text, so "ELI5" re-shows the form at once, without a model turn.
- *   Answers are recorded in `.documentizer/state.json`.
+ *   Answers are recorded in `docs/.documentizer/state.json`.
  * - `doc_topic` marks a topic done; the last one completes the interview.
+ * - `/strictly-docs` (commands/strictly-docs.md) implements from these documents.
  */
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -15,8 +16,10 @@ import type { ExtensionAPI } from "@oh-my-pi/pi-coding-agent";
 import { buildForm, type FormData, type Question, readAnswer, recommendationText } from "./form";
 import {
 	type DocState,
+	docsDir,
 	type Lang,
 	loadState,
+	migrateRootLayout,
 	newState,
 	remainingTopics,
 	saveState,
@@ -54,6 +57,7 @@ function renderPrompt(root: string, state: DocState, mode: "new" | "resume" | "u
 	const topics = TOPICS.map(t => `- [${state.topicsDone.includes(t.id) ? "x" : " "}] \`${t.id}\`: ${t[state.lang]}`).join("\n");
 	const vars: Record<string, string> = {
 		ROOT: root,
+		DOCS: docsDir(root),
 		LANG: state.lang === "tr" ? "Turkish" : "English",
 		MODE: mode,
 		TOPICS: topics,
@@ -69,7 +73,7 @@ export default function documentizerExtension(pi: ExtensionAPI): void {
 	let askQueue: Promise<unknown> = Promise.resolve();
 
 	pi.registerCommand("documentize", {
-		description: "Map this project and interview you topic by topic into PROJECT.md + PROJECT.space (--lang tr|en)",
+		description: "Map this project and interview you topic by topic into docs/PROJECT.md + docs/PROJECT.space (--lang tr|en)",
 		getArgumentCompletions: prefix =>
 			["--lang tr", "--lang en"].filter(arg => arg.startsWith(prefix.trim())).map(arg => ({ value: arg, label: arg })),
 		handler: async (args, ctx) => {
@@ -81,6 +85,8 @@ export default function documentizerExtension(pi: ExtensionAPI): void {
 				return;
 			}
 			const root = ctx.cwd;
+			const moved = migrateRootLayout(root);
+			if (moved.length > 0) ctx.ui.notify(`documentize: moved ${moved.join(", ")} into docs/`, "info");
 			const previous = loadState(root);
 			let state: DocState;
 			let mode: "new" | "resume" | "update";
@@ -109,7 +115,7 @@ export default function documentizerExtension(pi: ExtensionAPI): void {
 		name: "doc_ask",
 		label: "Documentizer Ask",
 		description:
-			"Ask the user ONE documentizer interview question as a form and record the answer in .documentizer/state.json. " +
+			"Ask the user ONE documentizer interview question as a form and record the answer in docs/.documentizer/state.json. " +
 			"Only during /documentize. The form always offers ELI5 (shows your eli5 text instantly), 'you decide' " +
 			"(records your recommendation as an agent decision), skip (open question) and stop (pause the interview).",
 		parameters: z.object({

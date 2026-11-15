@@ -1,6 +1,7 @@
 /**
- * Interview state, kept in `<project>/.documentizer/state.json` so `/documentize` can resume a
- * paused interview or, after a finished one, re-check only what changed since then.
+ * Interview state, kept in `<project>/docs/.documentizer/state.json` next to the documents it
+ * produces (`docs/PROJECT.md`, `docs/PROJECT.space`), so `/documentize` can resume a paused
+ * interview or, after a finished one, re-check only what changed since then.
  */
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -56,8 +57,31 @@ export interface DocState {
 	topics?: { id: TopicId; title: string }[];
 }
 
-export const stateDir = (root: string): string => path.join(root, ".documentizer");
+/** Where documentizer's documents live. */
+export const docsDir = (root: string): string => path.join(root, "docs");
+export const stateDir = (root: string): string => path.join(docsDir(root), ".documentizer");
 export const stateFile = (root: string): string => path.join(stateDir(root), "state.json");
+
+/** Files of the first layout, which kept everything in the project root. */
+const ROOT_LAYOUT = [".documentizer", "PROJECT.md", "PROJECT.space", "PROJECT.space.layout", "PROJECT.space.assets"];
+
+/**
+ * Moves an interview made with the root layout into `docs/`; returns the names moved. Only when
+ * `docs/` has no interview yet, and never over an existing file there.
+ */
+export function migrateRootLayout(root: string): string[] {
+	if (!fs.existsSync(path.join(root, ".documentizer", "state.json")) || fs.existsSync(stateFile(root))) return [];
+	fs.mkdirSync(docsDir(root), { recursive: true });
+	const moved: string[] = [];
+	for (const name of ROOT_LAYOUT) {
+		const from = path.join(root, name);
+		const to = path.join(docsDir(root), name);
+		if (!fs.existsSync(from) || fs.existsSync(to)) continue;
+		fs.renameSync(from, to);
+		moved.push(name);
+	}
+	return moved;
+}
 
 export function newState(lang: Lang): DocState {
 	return { version: 1, lang, phase: "interview", topicsDone: [], entries: [] };
