@@ -1,0 +1,6 @@
+{
+  "name": "documentizer",
+  "description": "documentizer: project interview into docs/PROJECT.md, then build strictly from it",
+  "owner": { "name": "Şeref Çimen" },
+  "plugins": [{ "name": "documentizer", "source": "./" }]
+}

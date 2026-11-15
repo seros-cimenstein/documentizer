@@ -1,15 +1,30 @@
 # documentizer
 
-omp add-on that maps a project's structure and interviews you, one question at a time, until every topic of its scope is written down in `docs/`; then `/strictly-docs` builds the project from those documents.
+Add-on for omp and Claude Code that maps a project's structure and interviews you, one question at a time, until every topic of its scope is written down in `docs/`; then `/strictly-docs` builds the project from those documents.
+
+Both need `bun` and, for the map, `loren` (Loren Space) on PATH. A project's `docs/` is shared: start the interview in one, continue or build in the other.
 
 ## Install
+
+### omp
 
 ```bash
 ./install.sh   # links extension/ to ~/.omp/agent/extensions/documentizer
                # and commands/strictly-docs.md to ~/.omp/agent/commands/
 ```
 
-Restart omp. The map needs `loren` (Loren Space) on PATH.
+Restart omp.
+
+### Claude Code
+
+The repo is a plugin and its own marketplace:
+
+```bash
+claude plugin marketplace add ~/projects/seref_omp_tools/documentizer
+claude plugin install documentizer@documentizer
+```
+
+Or for one session: `claude --plugin-dir ~/projects/seref_omp_tools/documentizer`. The commands are namespaced: `/documentizer:documentize [--lang tr|en]` and `/documentizer:strictly-docs [target]`, otherwise as below. Questions open as Claude Code dialogs (MCP elicitation): pick a choice, add free text in "Other / note", and choose the action (answer, ELI5, you decide, skip, stop); Esc or decline pauses the interview like Stop. DevDeck+ is omp-only.
 
 ## Use
 
@@ -58,9 +73,13 @@ An interview made before these lived in `docs/` (files in the project root) is m
 
 ## Repo
 
-- `extension/index.ts`: `/documentize`, `doc_ask` (one question form + recording), `doc_topic` (topic done, completion)
-- `extension/form.ts`: form HTML and answer parsing
+- `extension/interview.ts`: the shared core: starting/resuming/updating, the `doc_ask` question loop and recording, `doc_topic` completion, tool texts
+- `extension/index.ts`: omp adapter: `/documentize`, `doc_ask` (omp form), `doc_topic`
+- `extension/form.ts`: omp form HTML, answer parsing, UI labels
 - `extension/state.ts`: topics, `docs/.documentizer/state.json`, the move from the root layout
 - `extension/prompts/documentize.md`: the agent's instructions (structure scan, interview rules, outputs, MISSING items)
-- `commands/strictly-docs.md`: the `/strictly-docs` command
+- `commands/strictly-docs.md`: the `/strictly-docs` command (omp and Claude Code)
+- `.claude-plugin/`: Claude Code plugin manifest (declares the MCP server) and marketplace
+- `skills/documentize/SKILL.md`: Claude Code `/documentizer:documentize`; runs `claude/start.ts` to render the prompt
+- `claude/server.ts`: dependency-free stdio MCP server with `doc_ask` / `doc_topic`; `claude/elicit.ts`: the question as an elicitation form
 - `tests/`: `bun test`

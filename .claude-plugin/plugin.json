@@ -1,0 +1,14 @@
+{
+  "name": "documentizer",
+  "version": "1.0.0",
+  "description": "Maps a project and interviews you one question at a time until docs/PROJECT.md specifies it; /strictly-docs then builds from it",
+  "author": { "name": "Şeref Çimen" },
+  "keywords": ["documentation", "interview", "spec", "loren"],
+  "mcpServers": {
+    "documentizer": {
+      "command": "bun",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/claude/server.ts"],
+      "env": { "DOCUMENTIZER_ROOT": "${CLAUDE_PROJECT_DIR}" }
+    }
+  }
+}

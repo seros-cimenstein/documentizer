@@ -41,7 +41,8 @@ export type Outcome =
 	| { kind: "skip" }
 	| { kind: "stop" };
 
-const LABELS = {
+/** UI texts per language; also used by the Claude Code plugin's form (`claude/elicit.ts`). */
+export const LABELS = {
 	tr: {
 		eli5Title: "ELI5 (çok basit anlatım)",
 		yourAnswer: "Cevabın",
@@ -52,6 +53,8 @@ const LABELS = {
 		decide: "Bilmiyorum, sen karar ver",
 		skip: "Şimdilik atla (açık sorulara eklenir)",
 		stop: "Burada dur (kaydet, sonra kaldığım yerden devam)",
+		otherChoice: "Diğer (aşağıya yazacağım)",
+		otherText: "Diğer / not (seçime eklenir)",
 	},
 	en: {
 		eli5Title: "ELI5 (explained simply)",
@@ -63,6 +66,8 @@ const LABELS = {
 		decide: "I don't know, you decide",
 		skip: "Skip for now (goes to open questions)",
 		stop: "Stop here (save, resume later)",
+		otherChoice: "Other (I'll write it below)",
+		otherText: "Other / note (added to the choice)",
 	},
 } as const;
 

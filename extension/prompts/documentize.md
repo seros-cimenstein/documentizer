@@ -8,7 +8,7 @@ Topics (each becomes a PROJECT.md section, covered in this order):
 
 ## Outputs, in `{{DOCS}}`
 - `PROJECT.md`: title + one-line summary, then one section per topic, then **Map** (the output of `loren mermaid {{DOCS}}/PROJECT.space`), **Decisions** (answers I left to you, marked as agent decisions), **Open questions** (skipped or unanswered items). It is the specification `/strictly-docs` implements from, so write what must be built, concretely enough to build it.
-- `PROJECT.space`: the visual map. Run `loren guide` once first. Create it with `loren new {{DOCS}}/PROJECT.space --title "<project>" --root {{ROOT}} --pack software` if missing; grow it with `loren apply` in small steps (1-6 ops per call) as you learn, following the Loren Space skill. Keep it at 8-25 nodes.
+- `PROJECT.space`: the visual map. Run `loren guide` once first. Create it with `loren new {{DOCS}}/PROJECT.space --title "<project>" --root {{ROOT}} --pack software` if missing; grow it with `loren apply` in small steps (1-6 ops per call) as you learn, following `loren guide` (and the Loren Space skill where you have it). Keep it at 8-25 nodes.
 - `MISSING.md` is written by `/strictly-docs`, not by you: what it had to build without the documents saying how, under the PROJECT.md section it belongs to. See step 1.
 
 ## 1. Lay down the structure (before asking anything)
@@ -18,7 +18,7 @@ Topics (each becomes a PROJECT.md section, covered in this order):
 - **Any mode**, when `{{DOCS}}/MISSING.md` exists: each entry is a gap `/strictly-docs` filled with its own solution. In the topic of its section, ask me about it (context: what was missing, what was built, where), with "keep this solution" as the recommended choice. Write the answer into PROJECT.md, then delete the entry from MISSING.md and its MISSING card from PROJECT.space (`loren apply`); delete MISSING.md when it is empty.
 
 ## 2. Interview, topic by topic
-- Ask with `doc_ask` only, exactly ONE question per call, never several tools at once, never the generic `ask` tool. Wait for each answer before choosing the next question.
+- Ask with `doc_ask` only, exactly ONE question per call, never several tools at once, never a generic question tool (`ask`, `AskUserQuestion`). Wait for each answer before choosing the next question.
 - Never ask what the code already answers. Instead confirm it: "From `src/x.ts` I see ...; correct?" with choices like correct / partly / wrong.
 - Every question: 2-5 concrete choices when possible, your recommendation in `recommended`, a short `context` saying why you ask (what you found), and an `eli5` that explains the question with an everyday analogy, defines every technical word, and says what each choice would mean in practice.
 - Go to the full extent of the scope: stay on a topic until nothing in it is unknown, contradictory or unverified. Follow up on vague answers ("fast" → how fast? for whom?).
