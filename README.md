@@ -20,11 +20,11 @@ Restart omp.
 The repo is a plugin and its own marketplace:
 
 ```bash
-claude plugin marketplace add ~/projects/seref_omp_tools/documentizer
+claude plugin marketplace add seros-cimenstein/documentizer   # or a local clone's path
 claude plugin install documentizer@documentizer
 ```
 
-Or for one session: `claude --plugin-dir ~/projects/seref_omp_tools/documentizer`. The commands are namespaced: `/documentizer:documentize [--lang tr|en]` and `/documentizer:strictly-docs [target]`, otherwise as below. Questions open as Claude Code dialogs (MCP elicitation): pick a choice, add free text in "Other / note", and choose the action (answer, ELI5, you decide, skip, stop); Esc or decline pauses the interview like Stop. DevDeck+ is omp-only.
+Or for one session from a clone: `claude --plugin-dir path/to/documentizer`. The commands are namespaced: `/documentizer:documentize [--lang tr|en]` and `/documentizer:strictly-docs [target]`, otherwise as below. Questions open as Claude Code dialogs (MCP elicitation): pick a choice, add free text in "Other / note", and choose the action (answer, ELI5, you decide, skip, stop); Esc or decline pauses the interview like Stop. DevDeck+ is omp-only.
 
 ## Use
 
